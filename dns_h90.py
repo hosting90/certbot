@@ -8,6 +8,8 @@ from certbot import errors
 from certbot import interfaces
 from certbot.plugins import dns_common
 from certbot.plugins import dns_common_lexicon
+import pprint
+pp = pprint.PrettyPrinter(indent=4)
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +17,7 @@ HAPI_URL='https://bero.devel.hosting90.cz/api'
 
 class HostingApi(object):
     """docstring for HostingApi"""
-    
+    print "h90"
     def __init__(self,sid = None,fn = None):
         self.sid = sid
         self.fn = fn
@@ -43,11 +45,16 @@ class HostingApi(object):
         else:
             u = requests.post(myurl, data=post_args)
             text = u.content
-            
-        ret = json.loads(text)
+        print 'start\n' + text + ' \nend'
+	try:
+	    ret = json.loads(text)
+	except:
+	    print text + ' exception'
+	    raise
         
         if ret['reply']['status']['code'] == 0:
             del(ret['reply']['status'])
+	    print ret['reply']
             return ret['reply']
         else:
             raise Exception((ret['reply']['status']['code'], ret['reply']['status']['text']))
@@ -88,15 +95,35 @@ class Authenticator(dns_common.DNSAuthenticator):
     def more_info(self):  # pylint: disable=missing-docstring,no-self-use
         return 'This plugin configures a DNS TXT record to respond to a dns-01 challenge using ' + \
                'the Linode API.'
+    def _setup_credentials(self):
+        self.credentials = 'heslo'
+
 
     def _perform(self, domain, validation_name, validation):
         api = self._get_h90_client(domain)
         dl = api.domain_list()
         domain_id = dl['domains'][0]['domain_id']
         # ověřím, že je
+        print domain_id
+        
         dl = api.domain_list_dns(domain_id=domain_id)
-        # check non exists
-        if len(filter(lambda x: x['type'] == 'TXT' and x['name'] == validation_name and x['ip'] == validation,dl)) > 0:
+        print "domainlist"
+        pp.pprint(dl)
+        txt_records = self.get_type_records(dl['zone'],'TXT')
+        print "txtrecords"
+        pp.pprint(txt_records)
+#        print(validation_name)
+	validation_name = validation_name.split('.')[0]
+        print(validation_name)
+	# check non exists
+        print(validation)
+        
+        #print filter(lambda x: x['type'],dl)
+        #print filter(lambda x: x['name'],dl)
+        print "tadytoje"
+        print dl
+
+        if len(filter(lambda x: x['type'] == 'TXT' and x['name'] == validation_name and x['ip'] == validation, dl['zone'])) > 0:
             # záznam už existuje. není co dělat
             return True
         ret = api.domain_add_dns(domain_id=domain_id, post= {'name':validation_name, 'ttl':60, 'type':'TXT','ip':validation})
@@ -109,10 +136,27 @@ class Authenticator(dns_common.DNSAuthenticator):
         
         
     def _cleanup(self, domain, validation_name, validation):
-        # som dodelat smazani TXT zaznamu
+        api = self._get_h90_client(domain)
+        dl = api.domain_list()
+        domain_id = dl['domains'][0]['domain_id']
+        # ověřím, že je
+        dl = api.domain_list_dns(domain_id=domain_id)
+        txt_records = self.get_type_records(dl['zone'],'TXT')
+        #pp.pprint(txt_records)
+        print "deleting record"
+        #ret = api.domain_delete_dns(dns_id=txt_records[0]['dns_id'])
+        for r in txt_records:
+            print (r)
+            if r['ip']==validation:
+                ret = api.domain_delete_dns(dns_id=r['dns_id'])
+                print "deleted"
 
     def _get_h90_client(self,domain):
         api = HostingApi()
         api.login_callback(domain,'heslo')
         return api
+    
+    def get_type_records(self, record_list, mytype):
+        """docstring for find_txt_records"""
+        return filter(lambda x: x['type'] == mytype,record_list)
 
