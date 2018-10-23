@@ -17,7 +17,6 @@ HAPI_URL='https://bero.devel.hosting90.cz/api'
 
 class HostingApi(object):
     """docstring for HostingApi"""
-    print "h90"
     def __init__(self,sid = None,fn = None):
         self.sid = sid
         self.fn = fn
@@ -45,16 +44,13 @@ class HostingApi(object):
         else:
             u = requests.post(myurl, data=post_args)
             text = u.content
-        print 'start\n' + text + ' \nend'
 	try:
 	    ret = json.loads(text)
 	except:
-	    print text + ' exception'
 	    raise
         
         if ret['reply']['status']['code'] == 0:
             del(ret['reply']['status'])
-	    print ret['reply']
             return ret['reply']
         else:
             raise Exception((ret['reply']['status']['code'], ret['reply']['status']['text']))
@@ -105,24 +101,16 @@ class Authenticator(dns_common.DNSAuthenticator):
         dl = api.domain_list()
         domain_id = dl['domains'][0]['domain_id']
         # ověřím, že je
-        print domain_id
         
         dl = api.domain_list_dns(domain_id=domain_id)
-        print "domainlist"
-        pp.pprint(dl)
+        #pp.pprint(dl)
         txt_records = self.get_type_records(dl['zone'],'TXT')
-        print "txtrecords"
-        pp.pprint(txt_records)
-#        print(validation_name)
-	validation_name = validation_name.split('.')[0]
-        print(validation_name)
-	# check non exists
-        print(validation)
+        validation_name = validation_name.split('.')[0]
+
+	    # check non exists
         
         #print filter(lambda x: x['type'],dl)
         #print filter(lambda x: x['name'],dl)
-        print "tadytoje"
-        print dl
 
         if len(filter(lambda x: x['type'] == 'TXT' and x['name'] == validation_name and x['ip'] == validation, dl['zone'])) > 0:
             # záznam už existuje. není co dělat
@@ -144,13 +132,10 @@ class Authenticator(dns_common.DNSAuthenticator):
         dl = api.domain_list_dns(domain_id=domain_id)
         txt_records = self.get_type_records(dl['zone'],'TXT')
         #pp.pprint(txt_records)
-        print "deleting record"
         #ret = api.domain_delete_dns(dns_id=txt_records[0]['dns_id'])
         for r in txt_records:
-            print (r)
             if r['ip']==validation:
                 ret = api.domain_delete_dns(dns_id=r['dns_id'])
-                print "deleted"
 
     def _get_h90_client(self,domain):
         api = HostingApi()
