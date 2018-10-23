@@ -1,5 +1,5 @@
 """DNS Authenticator for Hosting90."""
-import logging,urllib,requests,json
+import logging
 
 import zope.interface
 from lexicon.providers import linode
