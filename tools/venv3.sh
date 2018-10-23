@@ -21,6 +21,7 @@ fi
   -e certbot-dns-gehirn \
   -e certbot-dns-google \
   -e certbot-dns-linode \
+  -e certbot-dns-h90e \
   -e certbot-dns-luadns \
   -e certbot-dns-nsone \
   -e certbot-dns-ovh \

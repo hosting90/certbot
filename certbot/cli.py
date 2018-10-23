@@ -1428,6 +1428,10 @@ def _plugins_parsing(helpful, plugins):
                 default=flag_default("dns_linode"),
                 help=("Obtain certificates using a DNS TXT record (if you are "
                       "using Linode for DNS)."))
+    helpful.add(["plugins", "certonly"], "--dns-h90", action="store_true",
+                default=flag_default("dns_h90"),
+                help=("Obtain certificates using a DNS TXT record (if you are "
+                      "using H90 for DNS)."))
     helpful.add(["plugins", "certonly"], "--dns-luadns", action="store_true",
                 default=flag_default("dns_luadns"),
                 help=("Obtain certificates using a DNS TXT record (if you are "

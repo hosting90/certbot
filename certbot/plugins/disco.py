@@ -33,6 +33,7 @@ class PluginEntryPoint(object):
         "certbot-dns-gehirn",
         "certbot-dns-google",
         "certbot-dns-linode",
+        "certbot-dns-h90",
         "certbot-dns-luadns",
         "certbot-dns-nsone",
         "certbot-dns-ovh",

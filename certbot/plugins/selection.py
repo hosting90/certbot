@@ -165,7 +165,7 @@ def choose_plugin(prepared, question):
 
 noninstaller_plugins = ["webroot", "manual", "standalone", "dns-cloudflare", "dns-cloudxns",
                         "dns-digitalocean", "dns-dnsimple", "dns-dnsmadeeasy", "dns-gehirn",
-                        "dns-google", "dns-linode", "dns-luadns", "dns-nsone", "dns-ovh",
+                        "dns-google", "dns-linode", "dns-h90", "dns-luadns", "dns-nsone", "dns-ovh",
                         "dns-rfc2136", "dns-route53", "dns-sakuracloud"]
 
 def record_chosen_plugins(config, plugins, auth, inst):
