@@ -9,6 +9,7 @@ from certbot import interfaces
 from certbot.plugins import dns_common
 from certbot.plugins import dns_common_lexicon
 import pprint
+import dns.resolver, time
 pp = pprint.PrettyPrinter(indent=4)
 
 logger = logging.getLogger(__name__)
@@ -118,11 +119,29 @@ class Authenticator(dns_common.DNSAuthenticator):
         ret = api.domain_add_dns(domain_id=domain_id, post= {'name':validation_name, 'ttl':60, 'type':'TXT','ip':validation})
         # tady počkej na to, až bude v DNS
         # optional
-        # while not _check_dns_active()
+        #time.sleep(3)
+        #_check_dns_active(validation_name, domain)
         
-    
-    # def _check_dns_active(self, domain_name):
-        
+        myResolver = dns.resolver.Resolver()
+        myResolver.nameservers = ['130.193.8.82','77.78.100.57']
+        #waitingdns = True
+        print validation
+        waitingperiod = 360
+        while waitingperiod > 0:
+            try:
+                myAnswers = myResolver.query(validation_name + "." + domain, "TXT")
+                for rdata in myAnswers:
+                    if str(rdata) == str("\"" + validation + "\""):
+                        print "DNS check - OK"
+                        waitingperiod = 0
+                    else:
+                        print "Active checking DNS - Waiting"
+                        waitingperiod = waitingperiod - 1
+            except:
+                print "Active checking DNS - Waiting"
+                waitingperiod = waitingperiod - 1
+            time.sleep(1)
+            
         
     def _cleanup(self, domain, validation_name, validation):
         api = self._get_h90_client(domain)
