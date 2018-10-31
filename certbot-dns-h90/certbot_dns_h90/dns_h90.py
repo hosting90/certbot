@@ -14,7 +14,7 @@ pp = pprint.PrettyPrinter(indent=4)
 
 logger = logging.getLogger(__name__)
 
-HAPI_URL='https://bero.devel.hosting90.cz/api'
+HAPI_URL='https://admin.systems90.cz/api'
 
 class HostingApi(object):
     """docstring for HostingApi"""
@@ -66,7 +66,7 @@ class HostingApi(object):
     def login_callback(self,domain,callback_hash):
         self.fn = 'login_callback'
         self.sid = None
-        ret = self.__call__(domain=domain,password=callback_hash)
+        ret = self.__call__(login=domain,password=callback_hash)
         
         self.sid = ret['sid']
 
